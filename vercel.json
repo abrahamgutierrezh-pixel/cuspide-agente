@@ -1,7 +1,6 @@
 {
   "name": "cuspide-agente",
   "version": 2,
-  "public": true,
   "buildCommand": "echo 'Build complete'",
   "env": {
     "ANTHROPIC_API_KEY": {
