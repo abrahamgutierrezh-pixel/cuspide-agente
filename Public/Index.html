@@ -1,1 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CÚSPIDE Agente — Generador de Contenido</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    :root {
+      --navy: #0B263F;
+      --gold: #B8964B;
+      --graphite: #1F2326;
+      --light: #F5F5F5;
+      --white: #FFFFFF;
+      --text: #1F1F1F;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--light);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 20px;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 42px;
+      color: var(--navy);
+      font-family: Georgia, serif;
+      font-weight: bold;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--graphite);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .form-panel {
+      background: var(--white);
+      padding: 28px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      position: sticky;
+      top: 20px;
+    }
+
+    .form-panel h2 {
+      font-size: 16px;
+      color: var(--navy);
+      margin-bottom: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      color: var(--graphite);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 4px;
+      border: 1px solid rgba(184, 150, 75, 0.25);
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text);
+      background-color: var(--white);
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: none;
+    }
+
+    .tone-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+
+    .tone-btn {
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1.5px solid rgba(31, 35, 38, 0.3);
+      background-color: transparent;
+      color: var(--graphite);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tone-btn.active {
+      border-color: var(--gold);
+      background-color: var(--navy);
+      color: var(--gold);
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 4px;
+      background-color: var(--navy);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .generate-btn:disabled {
+      background-color: var(--graphite);
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: var(--white);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .result-panel {
+      background: var(--white);
+      padding: 32px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .result-header {
+      margin-bottom: 20px;
+    }
+
+    .result-header h2 {
+      font-size: 14px;
+      color: var(--gold);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .divider {
+      width: 60px;
+      height: 3px;
+      background-color: var(--gold);
+      border-radius: 2px;
+    }
+
+    .format-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      margin-top: 20px;
+    }
+
+    .format-btn {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid rgba(31, 35, 38, 0.3);
+      background-color: transparent;
+      color: var(--graphite);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+    }
+
+    .format-btn.active {
+      border-color: var(--gold);
+      background-color: var(--navy);
+      color: var(--gold);
+    }
+
+    .preview-image {
+      width: 100%;
+      border-radius: 4px;
+      margin-bottom: 28px;
+      border: 1px solid rgba(184, 150, 75, 0.3);
+      display: block;
+    }
+
+    .download-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .download-btn {
+      padding: 8px 12px;
+      border-radius: 4px;
+      background-color: var(--graphite);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .download-btn:hover {
+      background-color: var(--navy);
+    }
+
+    .copy-section {
+      border-top: 1px solid rgba(31, 35, 38, 0.2);
+      padding-top: 20px;
+    }
+
+    .copy-item {
+      margin-bottom: 20px;
+    }
+
+    .copy-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .copy-label {
+      font-size: 11px;
+      color: var(--gold);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      font-size: 11px;
+      background: none;
+      border: none;
+      color: var(--gold);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .copy-content {
+      font-size: 13px;
+      color: var(--text);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .copy-content.titular {
+      color: var(--navy);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .copy-content.cta {
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .copy-content.hashtags {
+      color: var(--gold);
+    }
+
+    .empty-state {
+      background: var(--white);
+      padding: 60px 32px;
+      border-radius: 6px;
+      text-align: center;
+      color: var(--graphite);
+      font-size: 14px;
+    }
+
+    .error-message {
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      border-left: 4px solid #c62828;
+    }
+
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>CÚSPIDE AGENTE</h1>
+      <p>Generador de contenido estratégico</p>
+    </div>
+
+    <div class="main-grid">
+      <div class="form-panel">
+        <h2>Nueva Solicitud</h2>
+
+        <div class="form-group">
+          <label class="form-label">Pilar</label>
+          <select id="pillar">
+            <option value="riesgos">Riesgos No Vistos</option>
+            <option value="decisiones">Decisiones Estratégicas</option>
+            <option value="metodo">Método CÚSPIDE</option>
+            <option value="senales">Señales de Alerta</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tema Específico</label>
+          <textarea id="tema" placeholder="Ej: Empleados accediendo sistemas fuera de horario"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tono</label>
+          <div class="tone-buttons">
+            <button class="tone-btn active" data-tone="Estratégico">Estratégico</button>
+            <button class="tone-btn" data-tone="Alerta">Alerta</button>
+            <button class="tone-btn" data-tone="Educativo">Educativo</button>
+          </div>
+        </div>
+
+        <button class="generate-btn" id="generateBtn">Generar Contenido</button>
+      </div>
+
+      <div id="resultContainer">
+        <div class="empty-state">
+          Completa el formulario para generar tu primer post
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PALETTE = {
+      navy: '#0B263F',
+      gold: '#B8964B',
+      graphite: '#1F2326'
+    };
+
+    const PILLARS = {
+      riesgos: 'Riesgos No Vistos',
+      decisiones: 'Decisiones Estratégicas',
+      metodo: 'Método CÚSPIDE',
+      senales: 'Señales de Alerta'
+    };
+
+    let currentTone = 'Estratégico';
+    let currentResult = null;
+    let currentFormat = 'instagram';
+
+    document.querySelectorAll('.tone-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentTone = this.dataset.tone;
+      });
+    });
+
+    document.getElementById('generateBtn').addEventListener('click', generateContent);
+
+    async function generateContent() {
+      const tema = document.getElementById('tema').value.trim();
+      const pillar = document.getElementById('pillar').value;
+
+      if (!tema) {
+        alert('Por favor escribe un tema específico');
+        return;
+      }
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Generando...';
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            pillar,
+            tema,
+            tono: currentTone
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Error en la API');
+        }
+
+        const data = await response.json();
+
+        currentResult = {
+          titular: data.titular,
+          descripcion: data.descripcion,
+          cta: data.cta,
+          hashtags: data.hashtags,
+          pillar: PILLARS[pillar]
+        };
+
+        currentFormat = 'instagram';
+        renderResult();
+
+      } catch (error) {
+        console.error(error);
+        alert(`Error: ${error.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Generar Contenido';
+      }
+    }
+
+    function renderResult() {
+      const container = document.getElementById('resultContainer');
+      
+      const html = `
+        <div class="result-panel">
+          <div class="result-header">
+            <h2>${currentResult.pillar}</h2>
+            <div class="divider"></div>
+          </div>
+
+          <div class="format-buttons">
+            <button class="format-btn active" onclick="switchFormat('instagram')">📷 Instagram</button>
+            <button class="format-btn" onclick="switchFormat('facebook')">📘 Facebook</button>
+            <button class="format-btn" onclick="switchFormat('linkedin')">💼 LinkedIn</button>
+          </div>
+
+          <img id="preview" class="preview-image" src="" />
+
+          <div class="download-buttons">
+            <button class="download-btn" onclick="downloadImage('instagram')">⬇ Instagram</button>
+            <button class="download-btn" onclick="downloadImage('facebook')">⬇ Facebook</button>
+            <button class="download-btn" onclick="downloadImage('linkedin')">⬇ LinkedIn</button>
+          </div>
+
+          <div class="copy-section">
+            <div class="copy-item">
+              <div class="copy-header">
+                <h3 class="copy-label">Titular</h3>
+                <button class="copy-btn" onclick="copyText('${currentResult.titular.replace(/'/g, "\\'")}')">Copiar</button>
+              </div>
+              <p class="copy-content titular">${currentResult.titular}</p>
+            </div>
+
+            <div class="copy-item">
+              <div class="copy-header">
+                <h3 class="copy-label">Descripción</h3>
+                <button class="copy-btn" onclick="copyText('${currentResult.descripcion.replace(/'/g, "\\'")}')">Copiar</button>
+              </div>
+              <p class="copy-content">${currentResult.descripcion}</p>
+            </div>
+
+            <div class="copy-item">
+              <div class="copy-header">
+                <h3 class="copy-label">CTA</h3>
+                <button class="copy-btn" onclick="copyText('${currentResult.cta.replace(/'/g, "\\'")}')">Copiar</button>
+              </div>
+              <p class="copy-content cta">${currentResult.cta}</p>
+            </div>
+
+            <div class="copy-item">
+              <div class="copy-header">
+                <h3 class="copy-label">Hashtags</h3>
+                <button class="copy-btn" onclick="copyText('${currentResult.hashtags.replace(/'/g, "\\'")}')">Copiar</button>
+              </div>
+              <p class="copy-content hashtags">${currentResult.hashtags}</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+      renderImage('instagram');
+    }
+
+    function switchFormat(format) {
+      currentFormat = format;
+      document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderImage(format);
+    }
+
+    function renderImage(format) {
+      const sizes = {
+        instagram: { w: 1080, h: 1080 },
+        facebook: { w: 1200, h: 628 },
+        linkedin: { w: 1080, h: 1080 }
+      };
+
+      const size = sizes[format];
+      const canvas = document.createElement('canvas');
+      canvas.width = size.w;
+      canvas.height = size.h;
+
+      const ctx = canvas.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, size.w, size.h);
+      grad.addColorStop(0, PALETTE.navy);
+      grad.addColorStop(1, PALETTE.graphite);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, size.w, size.h);
+
+      ctx.fillStyle = PALETTE.gold;
+      ctx.fillRect(0, size.h * 0.12, size.w, 6);
+
+      ctx.font = `bold ${size.w > 1100 ? 52 : 48}px serif`;
+      ctx.fillStyle = PALETTE.gold;
+      ctx.textAlign = 'center';
+      wrapText(ctx, currentResult.titular, size.w / 2, size.h * 0.25, size.w - 100, 70);
+
+      ctx.font = `${size.w > 1100 ? 24 : 20}px sans-serif`;
+      ctx.fillStyle = '#F0F0F0';
+      wrapText(ctx, currentResult.descripcion, size.w / 2, size.h * 0.60, size.w - 80, 45);
+
+      ctx.font = 'bold 22px serif';
+      ctx.fillStyle = PALETTE.gold;
+      ctx.textAlign = 'left';
+      ctx.fillText('CÚSPIDE', 40, size.h - 50);
+
+      const imgData = canvas.toDataURL('image/png');
+      document.getElementById('preview').src = imgData;
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+
+      words.forEach(word => {
+        const testLine = line + (line ? ' ' : '') + word;
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width > maxWidth && line) {
+          ctx.fillText(line, x, y);
+          line = word;
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      });
+
+      if (line) ctx.fillText(line, x, y);
+    }
+
+    function downloadImage(format) {
+      const sizes = {
+        instagram: { w: 1080, h: 1080 },
+        facebook: { w: 1200, h: 628 },
+        linkedin: { w: 1080, h: 1080 }
+      };
+
+      const size = sizes[format];
+      const canvas = document.createElement('canvas');
+      canvas.width = size.w;
+      canvas.height = size.h;
+
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createLinearGradient(0, 0, size.w, size.h);
+      grad.addColorStop(0, PALETTE.navy);
+      grad.addColorStop(1, PALETTE.graphite);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, size.w, size.h);
+
+      ctx.fillStyle = PALETTE.gold;
+      ctx.fillRect(0, size.h * 0.12, size.w, 6);
+
+      ctx.font = `bold ${size.w > 1100 ? 52 : 48}px serif`;
+      ctx.fillStyle = PALETTE.gold;
+      ctx.textAlign = 'center';
+      wrapText(ctx, currentResult.titular, size.w / 2, size.h * 0.25, size.w - 100, 70);
+
+      ctx.font = `${size.w > 1100 ? 24 : 20}px sans-serif`;
+      ctx.fillStyle = '#F0F0F0';
+      wrapText(ctx, currentResult.descripcion, size.w / 2, size.h * 0.60, size.w - 80, 45);
+
+      ctx.font = 'bold 22px serif';
+      ctx.fillStyle = PALETTE.gold;
+      ctx.textAlign = 'left';
+      ctx.fillText('CÚSPIDE', 40, size.h - 50);
+
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cuspide_${format}_${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copiado al portapapeles');
+      });
+    }
+  </script>
+</body>
+</html>
