@@ -1,13 +1,4 @@
 {
-  "outputDirectory": "public",
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/public/index.html"
-    }
-  ]
+  "buildCommand": "echo 'Build complete'",
+  "outputDirectory": "public"
 }
