@@ -1,12 +1,8 @@
 {
   "name": "cuspide-agente",
   "version": "1.0.0",
-  "description": "Generador de contenido estratégico para Cúspide",
+  "description": "Generador de contenido Cúspide",
   "scripts": {
-    "dev": "vercel dev",
     "build": "echo 'No build needed'"
-  },
-  "keywords": ["cuspide", "contenido", "redes sociales"],
-  "author": "Cúspide Consulting",
-  "license": "MIT"
+  }
 }
