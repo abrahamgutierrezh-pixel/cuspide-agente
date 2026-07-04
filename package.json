@@ -1,8 +1,0 @@
-{
-  "name": "cuspide-agente",
-  "version": "1.0.0",
-  "description": "Generador de contenido Cúspide",
-  "scripts": {
-    "build": "echo 'No build needed'"
-  }
-}
