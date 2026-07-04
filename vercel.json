@@ -1,13 +1,4 @@
 {
-  "name": "cuspide-agente",
-  "version": 2,
-  "buildCommand": "echo 'Build complete'",
-  "env": {
-    "ANTHROPIC_API_KEY": {
-      "description": "Tu API key de Anthropic",
-      "required": true
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
